@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>World Generation</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<!-- LaTeX render options -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css" integrity="sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X" crossorigin="anonymous">
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js" integrity="sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz" crossorigin="anonymous"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    </head>
+    <body>
+        <header>
+	  <nav>
+	    <a class="home" href="../index.html">Home</a> 
+	    <a href="../papers.html">Papers</a> 
+	    <a href="../cv.html">CV</a> 
+	    <a href="../writing.html">Writing</a>
+	    <a href="../quotes.html">Quotes</a> 
+	  </nav>
+        </header>
+
+        <main role="main">
+          <h1>World Generation</h1>
+	  <div class="pdf">
+	  
+	  
+	  </div>
+	  <div class="content-body">
+	    <h2 id="phases-of-world-generation">Phases of world generation</h2>
+<p>We start by making a graph that represents the connectivity between different areas.
+E.g. we could specify that the second and third area connect to the first,
+however the third area is locked,
+so you need to complete the second area,
+to unlock the third.</p>
+<div class="sourceCode" id="cb1" data-tangle="no"><pre class="sourceCode dot"><code class="sourceCode dot"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">digraph</span> <span class="va">example1</span> <span class="ot">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"> </span><span class="va">area1</span><span class="co"> </span><span class="ot">-&gt;</span><span class="co"> </span><span class="va">area2</span><span class="ot">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"> </span><span class="va">area1</span><span class="co"> </span><span class="ot">-&gt;</span><span class="co"> </span><span class="va">area3</span><span class="ot">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">}</span></span></code></pre></div>
+<p>Using this layout method,
+we can write a generator for history elements,
+that output this area graph.
+Allowing us to generate all different map variations of a given history.</p>
+<p>Now we have a graph with some restrictions,
+that we want to turn into a world.
+The way we do this, is by taking the <strong>dual</strong> of the graph,
+which gives us another graph that we then <strong>plot as a straight-line planar graph</strong>,
+by adding an outer face (triangle),
+then triangualting the rest of the graph to make it <a href="https://en.wikipedia.org/wiki/K-vertex-connected_graph">3-connected</a>
+and then using <a href="https://en.wikipedia.org/wiki/Tutte_embedding">Tutte embedding</a>.
+Once we have the embedding,
+we again take the dual,
+giving us the faces for each area.</p>
+<h2 id="tutte-embedding">Tutte Embedding</h2>
+<p>The Tutte embedding (drawing) of a 3-connected planar graph,
+is done by choosing an outer face,
+which is kept static,
+and then position the rest of the vertices by placing them at the <strong>barycentric coordinates</strong> of their neighbors.
+This can be done by simulating edges as springs.</p>
+<p><span class="math inline">$F_{rep} = 0 \frac{}{}$</span>
+$F<sub>attr</sub> = ∑<sub>(u,v)∈ E</sub><sup></sup>  $
+$ F = F<sub>rep</sub> + F<sub>attr</sub>  $</p>
+<h2 id="triangulation">Triangulation</h2>
+<p><a href="https://en.wikipedia.org/wiki/Triangulation_(geometry)">Triangulation</a> is the process of making a graph 3-connected,
+this is done by spliting all faces into triangles.</p>
+<h2 id="dual">Dual</h2>
+<p>Taking the dual makes vertices into faces, and faces into vertices.
+This allows us to transform the connectivity graph into areas.</p>
+<h2 id="further-reading">Further reading</h2>
+<p>An alternative to tutte embedding is using SPQR trees,
+which can be constructed in O(n) time (hard to implement).
+They represent all embeddings, so generating / changing the world dynamically will be alot easier.</p>
+<h2 id="testing-using-random-graphs">Testing using random graphs</h2>
+<p>Now we have a good generic algorithm for generating a map,
+however we have only shown examples of small graphs.
+To test the algorithm we will therefore generate a large planar graph,
+and try to generate the map based on that.</p>
+<p>To generate a large random planar map, we will use <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a> (a common technique to just generate a random map),
+we compute it using <strong>Bowyer–Watson algorithm</strong>.</p>
+	  </div>
+        </main>
+	
+        <footer>
+	    Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>
