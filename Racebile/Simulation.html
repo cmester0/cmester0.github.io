@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Racebile Simulation</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<!-- LaTeX render options -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css" integrity="sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X" crossorigin="anonymous">
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js" integrity="sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz" crossorigin="anonymous"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    </head>
+    <body>
+        <header>
+	  <nav>
+	    <a class="home" href="../index.html">Home</a> 
+	    <a href="../papers.html">Papers</a> 
+	    <a href="../cv.html">CV</a> 
+	    <a href="../writing.html">Writing</a>
+	    <a href="../quotes.html">Quotes</a> 
+	  </nav>
+        </header>
+
+        <main role="main">
+          <h1>Racebile Simulation</h1>
+	  <div class="pdf">
+	  
+	  
+	  </div>
+	  <div class="content-body">
+	    <h2 id="overview-of-racebile">Overview of Racebile</h2>
+<h2 id="how-to-draw-a-hex-map">How to draw a hex map</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>cx, cy, scale <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> raw_hax_coord(x, y):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    xs, ys <span class="op">=</span> <span class="dv">3</span> <span class="op">*</span> cos(pi<span class="op">/</span><span class="dv">3</span>), sin(pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    xi, yi <span class="op">=</span> (xs <span class="op">*</span> x, ys <span class="op">*</span> (x <span class="op">+</span> y <span class="op">*</span> <span class="dv">2</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> xi, yi</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hex_coord(x,y):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    xi,yi <span class="op">=</span> raw_hax_coord(x,y)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    xi <span class="op">=</span>  width <span class="op">//</span> <span class="dv">2</span> <span class="op">+</span> (xi<span class="op">-</span>cx) <span class="op">*</span> scale</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    yi <span class="op">=</span> height <span class="op">//</span> <span class="dv">2</span> <span class="op">+</span> (yi<span class="op">-</span>cy) <span class="op">*</span> scale</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> xi, yi</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_hex(xi, yi, color):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">round</span>(<span class="op">-</span>scale<span class="op">*</span>cos(pi<span class="op">/</span><span class="dv">3</span>)), <span class="bu">round</span>(scale<span class="op">*</span>cos(pi<span class="op">/</span><span class="dv">3</span>))<span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        m[<span class="bu">round</span>(xi<span class="op">+</span>k)][<span class="bu">round</span>(yi<span class="op">+</span>scale<span class="op">*</span>sin(pi<span class="op">/</span><span class="dv">3</span>))] <span class="op">=</span> color</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        m[<span class="bu">round</span>(xi<span class="op">+</span>k)][<span class="bu">round</span>(yi<span class="op">-</span>scale<span class="op">*</span>sin(pi<span class="op">/</span><span class="dv">3</span>))] <span class="op">=</span> color</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, scale <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        corner_x, corner_y <span class="op">=</span> scale<span class="op">*</span>cos(pi<span class="op">/</span><span class="dv">3</span>), scale<span class="op">*</span>sin(pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        m[<span class="bu">round</span>(xi<span class="op">-</span>corner_x<span class="op">-</span>k<span class="op">*</span>cos(pi<span class="op">/</span><span class="dv">3</span>))][<span class="bu">round</span>(yi<span class="op">-</span>corner_y<span class="op">+</span>k<span class="op">*</span>sin(pi<span class="op">/</span><span class="dv">3</span>))] <span class="op">=</span> color</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        m[<span class="bu">round</span>(xi<span class="op">-</span>corner_x<span class="op">-</span>k<span class="op">*</span>cos(pi<span class="op">/</span><span class="dv">3</span>))][<span class="bu">round</span>(yi<span class="op">+</span>corner_y<span class="op">-</span>k<span class="op">*</span>sin(pi<span class="op">/</span><span class="dv">3</span>))] <span class="op">=</span> color</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        m[<span class="bu">round</span>(xi<span class="op">+</span>corner_x<span class="op">+</span>k<span class="op">*</span>cos(pi<span class="op">/</span><span class="dv">3</span>))][<span class="bu">round</span>(yi<span class="op">-</span>corner_y<span class="op">+</span>k<span class="op">*</span>sin(pi<span class="op">/</span><span class="dv">3</span>))] <span class="op">=</span> color</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        m[<span class="bu">round</span>(xi<span class="op">+</span>corner_x<span class="op">+</span>k<span class="op">*</span>cos(pi<span class="op">/</span><span class="dv">3</span>))][<span class="bu">round</span>(yi<span class="op">+</span>corner_y<span class="op">-</span>k<span class="op">*</span>sin(pi<span class="op">/</span><span class="dv">3</span>))] <span class="op">=</span> color</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_hex_grid():</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(x_min<span class="op">-</span><span class="dv">1</span>, x_max<span class="op">+</span><span class="dv">1</span><span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_min<span class="op">-</span><span class="dv">1</span>, y_max<span class="op">+</span><span class="dv">1</span><span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            xi, yi <span class="op">=</span> hex_coord(i, j)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> (scale <span class="op">&lt;=</span> xi <span class="op">&lt;</span> width<span class="op">-</span>scale <span class="kw">and</span> scale <span class="op">&lt;=</span> yi <span class="op">&lt;</span> width<span class="op">-</span>scale):</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            color <span class="op">=</span> (<span class="dv">255</span>, <span class="dv">255</span>, <span class="dv">255</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            draw_hex(xi, yi, color)</span></code></pre></div>
+<h3 id="the-different-maps">The different maps</h3>
+<p><img src="../images/loop_map.png" width="500" /></p>
+<p><img src="../images/rtfm_map.png" width="500" /></p>
+<h2 id="the-rules-of-the-game">The rules of the game</h2>
+<p>Technical values:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sips <span class="op">=</span> {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;turn&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;off_map&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;gas&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;bonk&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;gear_box&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;start_last&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;end_first&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;halfway_cheer&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;goal_cheer&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;koblingsfejl&quot;</span>: <span class="dv">0</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;no_sips&quot;</span>: <span class="dv">0</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Calculation:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>total_sips <span class="op">=</span> sips[<span class="st">&quot;turn&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  (sips[<span class="st">&quot;gas&quot;</span>]<span class="op">-</span><span class="dv">2</span> <span class="cf">if</span> sips[<span class="st">&quot;gas&quot;</span>] <span class="op">&gt;</span> <span class="dv">2</span> <span class="cf">else</span> <span class="dv">0</span>) <span class="op">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">5.5</span> <span class="op">*</span> sips[<span class="st">&quot;off_map&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  sips[<span class="st">&quot;bonk&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">11</span> <span class="op">*</span> sips[<span class="st">&quot;gear_box&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  sips[<span class="st">&quot;start_last&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  sips[<span class="st">&quot;end_first&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  sips[<span class="st">&quot;halfway_cheer&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  sips[<span class="st">&quot;goal_cheer&quot;</span>] <span class="op">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  sips[<span class="st">&quot;koblingsfejl&quot;</span>]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> total_sips <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  sips[<span class="st">&quot;no_sips&quot;</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  total_sips <span class="op">=</span> <span class="dv">1</span></span></code></pre></div>
+<h2 id="stats-we-want-to-check">Stats we want to check</h2>
+<p>Loop map</p>
+<p>8 players:</p>
+<ul>
+<li>Average drinking: 4.288773125 [100000 turns]</li>
+<li>Turns before first player pass start (7-13): 9.1454 [10000 runs]</li>
+<li>Turns before last player pass start (11-57): 20.7261 [10000 runs]</li>
+</ul>
+<p>7 players:</p>
+<ul>
+<li>Average drinking: 4.189491428 [100000 turns]</li>
+<li>Turns before first player pass start (7-14): 9.1583 [10000 runs]</li>
+<li>Turns before last player pass start (10-73): 19.8523 [10000 runs]</li>
+</ul>
+<p>6 players:</p>
+<ul>
+<li>Average drinking:</li>
+</ul>
+<p>5 players:</p>
+<ul>
+<li>Average drinking:</li>
+</ul>
+<p>4 players:</p>
+<ul>
+<li>Average drinking: 3.961765 [100000 turns]</li>
+<li>Turns before first player pass start (7-21): 9.3687 [10000 runs]</li>
+<li>Turns before last player pass start (9-63): 16.5963 [10000 runs]</li>
+</ul>
+<p>3 players:
+Average drinking:
+2 players:</p>
+<ul>
+<li>Average drinking: 4.097325 [100000 turns]</li>
+<li>Turns before first player pass start (7-28): 9.9845 [10000 runs]</li>
+<li>Turns before last player pass start (8-55): 13.7969 [10000 runs]</li>
+</ul>
+<p>1 players:</p>
+<ul>
+<li>Average drinking: 4.94921 [100000 turns]</li>
+<li>Turns before player pass start (7-45): 11.864 [10000 runs]</li>
+</ul>
+<p>RTFM map</p>
+	  </div>
+        </main>
+	
+        <footer>
+	    Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>
