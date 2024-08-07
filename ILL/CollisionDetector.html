@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Collision Detector</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<!-- LaTeX render options -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css" integrity="sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X" crossorigin="anonymous">
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js" integrity="sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz" crossorigin="anonymous"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+	<!-- math jax -->
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	<!-- tikz jax -->
+	<link rel="stylesheet" type="text/css" href="http://tikzjax.com/v1/fonts.css">
+	<script src="https://tikzjax.com/v1/tikzjax.js"></script>
+
+    </head>
+    <body>
+        <header>
+	  <nav>
+	    <a class="home" href="../index.html">Home</a> 
+	    <a href="../papers.html">Papers</a> 
+	    <a href="../cv.html">CV</a> 
+	    <a href="../writing.html">Writing</a>
+	    <a href="../quotes.html">Quotes</a> 
+	  </nav>
+        </header>
+
+        <main role="main">
+          <h1>Collision Detector</h1>
+	  <div class="pdf">
+	  
+	  
+	  </div>
+	  <div class="content-body">
+	    <p>The different protocols you might go through when figuring out how precise you want your collision detection.</p>
+<h1 id="space-coherent-data-structures">Space-Coherent Data Structures</h1>
+<h2 id="quad-tree">Quad-Tree</h2>
+<p>The basic idea of a quad-tree is we make a tree, where each node has up to four children, thereby subdividing space into quads as needed.</p>
+<center>
+<script type="text/tikz">
+  \begin{tikzpicture}
+    \draw[black] (0,0) -- (10,0) ;
+    \draw[black] (0,0) -- (0,10) ;
+    \draw[black] (10,0) -- (10,10) ;
+    \draw[black] (0,10) -- (10,10) ;
+
+    % First subdivide
+    \draw[black] (5,0) -- (5,10) ;
+    \draw[black] (0,5) -- (10,5) ;
+
+    % lower left subdivide
+    \draw[black] (2.5,0) -- (2.5,5) ;
+    \draw[black] (0,2.5) -- (5,2.5) ;
+
+    % upper right subdivide
+    \draw[black] (7.5,5) -- (7.5,10) ;
+    \draw[black] (5,7.5) -- (10,7.5) ;
+
+    % upper right  subdivide lower left subdivide
+    \draw[black] (6.25,5) -- (6.25,7.5) ;
+    \draw[black] (5,6.25) -- (7.5,6.25) ;
+
+    % upper right  subdivide lower left subdivide, lower right
+    \draw[black] (6.875,5) -- (6.875,6.25) ;
+    \draw[black] (6.25,5.625) -- (7.5,5.625) ;
+
+    % upper right  subdivide lower left subdivide, lower right, upper left
+    \draw[black] (6.5625,5) -- (6.5625,5.625) ;
+    \draw[black] (6.25,5.3125) -- (6.875,5.3125) ;
+    % \draw[blue] (1,0.5) -- (4,0.5) ;
+  \end{tikzpicture}
+</script>
+</center>
+
+<p>A quad tree is good for static spatial structures. We use it in collision detection, to store our collision boxes, since lookup in a range takes <span class="math inline">𝒪(log <em>n</em>)</span> time. We can create the tree once for static collision boxes, taking <span class="math inline">𝒪(<em>n</em>log <em>n</em>)</span> time, however for the dynamic collision boxes, we have to recreate the tree for each update. This still gives a speedup from brute force of <span class="math inline">𝒪(<em>n</em><sup>2</sup>)</span> to <span class="math inline">𝒪(<em>n</em>⋅log <em>n</em>)</span> for a collision check.</p>
+<h1 id="collision-detection">Collision Detection</h1>
+<h2 id="intervals">Intervals</h2>
+<p>A <code>start</code> and <code>end</code> value. The following is the algorithm to determin overlap of two intervals <span class="math inline"><em>a</em>, <em>b</em></span>:
+<span class="math display">$$
+\begin{array}
+~\qquad~~~ (a_{start} \leq b_{start} \quad \land \quad b_{start} \leq a_{end}) \newline
+\strut \quad \lor \ \ \ (a_{start} \leq b_{end} \quad \ \land \quad b_{end} \leq a_{end}) \newline
+\strut \quad \lor \ \ \ (a_{start} \leq b_{start} \quad \land \quad b_{end} \leq a_{end}) \newline
+\strut \quad \lor \ \ \ (b_{start} \leq a_{start} \quad \land \quad a_{end} \leq b_{end})
+\end{array}
+$$</span></p>
+<p>The four cases can be visualized as</p>
+<center>
+<script type="text/tikz">
+    \begin{tikzpicture}
+      \draw[red] (0,0) -- (3,0) ;
+      \draw[blue] (1,0.5) -- (4,0.5) ;
+
+      \draw[red] (0+6,0) -- (3+6,0) ;
+      \draw[blue] (-1+6,0.5) -- (2+6,0.5) ;
+
+      \draw[red] (0,0-1.5) -- (3,0-1.5) ;
+      \draw[blue] (1,0.5-1.5) -- (2,0.5-1.5) ;
+
+      \draw[red] (0+6,0-1.5) -- (3+6,0-1.5) ;
+      \draw[blue] (-1+6,0.5-1.5) -- (4+6,0.5-1.5) ;
+    \end{tikzpicture}
+</script>
+</center>
+
+<p>If we generalize these intervals to two dimensional squares, we get the 16 cases</p>
+<center>
+<script type="text/tikz">
+    \begin{tikzpicture}
+      % red grid:
+      \draw[red] (1.5,1) rectangle (4.5,4) ;
+      \draw[red] (6.5,1) rectangle (9.5,4) ;
+      \draw[red] (11.5,1) rectangle (14.5,4) ;
+      \draw[red] (16.5,1) rectangle (19.5,4) ;
+
+      \draw[red] (1.5,6) rectangle (4.5,9) ;
+      \draw[red] (6.5,6) rectangle (9.5,9) ;
+      \draw[red] (11.5,6) rectangle (14.5,9) ;
+      \draw[red] (16.5,6) rectangle (19.5,9) ;
+
+      \draw[red] (1.5,11) rectangle (4.5,14) ;
+      \draw[red] (6.5,11) rectangle (9.5,14) ;
+      \draw[red] (11.5,11) rectangle (14.5,14) ;
+      \draw[red] (16.5,11) rectangle (19.5,14) ;
+
+      \draw[red] (1.5,16) rectangle (4.5,19) ;
+      \draw[red] (6.5,16) rectangle (9.5,19) ;
+      \draw[red] (11.5,16) rectangle (14.5,19) ;
+      \draw[red] (16.5,16) rectangle (19.5,19) ;
+
+      % Lines Left 1:
+      \draw[red] (0.5,16) -- (0.5,19) ;
+      \draw[blue] (0.75,16.5) -- (0.75,19.5) ;
+
+      % blue
+      \draw[blue] (2,16.5) rectangle (5,19.5) ;
+      \draw[blue] (7,16.5) rectangle (9,19.5) ;
+      \draw[blue] (12,16.5) rectangle (15,19.5) ;
+      \draw[blue] (16,16.5) rectangle (20,19.5) ;
+
+      % Lines Left 2:
+      \draw[red] (0.5,11) -- (0.5,14) ;
+      \draw[blue] (0.75,11.5) -- (0.75,13.5) ;
+
+      % blue
+      \draw[blue] (2,11.5) rectangle (5,13.5) ;
+      \draw[blue] (7,11.5) rectangle (9,13.5) ;
+      \draw[blue] (12,11.5) rectangle (15,13.5) ;
+      \draw[blue] (16,11.5) rectangle (20,13.5) ;
+
+      % Lines Left 3:
+      \draw[red] (0.5,6) -- (0.5,9) ;
+      \draw[blue] (0.75,5.5) -- (0.75,8.5) ;
+
+      % blue
+      \draw[blue] (2,5.5) rectangle (5,8.5) ;
+      \draw[blue] (7,5.5) rectangle (9,8.5) ;
+      \draw[blue] (12,5.5) rectangle (15,8.5) ;
+      \draw[blue] (16,5.5) rectangle (20,8.5) ;
+
+      % Lines Left 4:
+      \draw[red] (0.5,1) -- (0.5,4) ;
+      \draw[blue] (0.75,0.5) -- (0.75,4.5) ;
+
+      % blue
+      \draw[blue] (2,0.5) rectangle (5,4.5) ;
+      \draw[blue] (7,0.5) rectangle (9,4.5) ;
+      \draw[blue] (12,0.5) rectangle (15,4.5) ;
+      \draw[blue] (16,0.5) rectangle (20,4.5) ;
+
+      % Bottom Line 1:
+      \draw[red] (1.5,-0.5) -- (4.5,-0.5) ;
+      \draw[blue] (2,-0.25) -- (5,-0.25) ;
+
+      % Bottom Line 2:
+      \draw[red] (6.5,-0.5) -- (9.5,-0.5) ;
+      \draw[blue] (7,-0.25) -- (9,-0.25) ;
+
+      % Bottom Line 3:
+      \draw[red] (11.5,-0.5) -- (14.5,-0.5) ;
+      \draw[blue] (12,-0.25) -- (15,-0.25) ;
+
+      % Bottom Line 4:
+      \draw[red] (16.5,-0.5) -- (19.5,-0.5) ;
+      \draw[blue] (16,-0.25) -- (20,-0.25) ;
+    \end{tikzpicture}
+</script>
+</center>
+
+<p>This is also sometimes called axis-aligned bounding boxes (AABB), since all collisions checks are for squares that are axis aligned.</p>
+<h3 id="problem-with-aabb">Problem with AABB</h3>
+<p>The issue with AABB is when we introduce rotation, or non-square collision polygons, since we get false positives, where the bounding box says there is a collision, without there being an actual collision, see  for an example.</p>
+<center>
+<script type="text/tikz">
+    \begin{tikzpicture}
+      % red:
+      \draw[red] (1.75,1) -- (4, 4) ;
+      \draw[red] (4, 4) -- (1.5, 3.5) ;
+      \draw[red] (1.75,1) -- (1.5, 3.5) ;
+
+      % blue:
+      \draw[blue] (2,0.5) -- (4.5, 4.5) ;
+      \draw[blue] (4.5, 4.5) -- (5, 1.5) ;
+      \draw[blue] (2,0.5) -- (5, 1.5) ;
+
+      % red:
+      \draw[red, dashed] (1.5,1) rectangle (4,4) ;
+
+      % blue
+      \draw[blue, dashed] (2,0.5) rectangle (5,4.5) ;
+
+    \end{tikzpicture}
+</script>
+</center>
+
+<h2 id="separating-axis-theorem-sat">Separating Axis Theorem (SAT)</h2>
+<p>The idea in the separating axis theorem, is that we handle collision by looking for overlap in (collision) in each dimension (of a selected basis, normally just axis aligned), and only if there is a collision in all dimensions, we get an actual collision.</p>
+<h3 id="problems-with-sat">Problems with SAT</h3>
+<p>The problem with SAT is that we might choose a bad axis to check for separation, meaning we will end up with a collision, where there should be none, see  for an example. An alternative solution is to use each axis of one of the polygons as the basis, which will always find the separating axis, if it exists. However this increases the complexity of computing collision, since we now increment the collision time drastically, based on the complexity of the collision polygon.</p>
+<center>
+<script type="text/tikz">
+      \begin{tikzpicture}
+        \draw[red] (3.5,3.5) -- (2.5,5) -- (3.5,5.5) -- (5,5) -- (4.5,4) -- (3.5,3.5) ;
+        \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+        \draw[red] (2.5,2.15) -- (5,2.15) ;
+        \draw[blue] (3.25,2.25) -- (6,2.25) ;
+
+        \draw[red] (2.2,3.5) -- (2.2,5.5) ;
+        \draw[blue] (2.3,2.5) -- (2.3,4.2) ;
+      \end{tikzpicture}
+</script>
+</center>
+
+<p>With non-axis aligned projections</p>
+<center>
+<script type="text/tikz">
+      \begin{tikzpicture}
+        \draw[red] (3.5,3.5) -- (2.5,5) -- (3.5,5.5) -- (5,5) -- (4.5,4) -- (3.5,3.5) ;
+        \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+        \draw[red] (3.405,3.335) circle (.1mm) ;
+        \draw[red] (3.405,3.335) -- (5,4.2) ;
+        \draw[red,dotted] (5,4.2) -- (5.32,4.375) ;
+        \draw[red] (5.32,4.375) circle (.1mm) ;
+
+        \draw[red] (3.5,2.5) circle (.1mm) ;
+        \draw[red,dotted] (3.5,2.5) -- (4,2.5) ;
+        \draw[red] (4,2.5) -- (5,2.5) ;
+        \draw[red] (5,2.5) circle (.1mm) ;
+
+        \draw[red] (4.725,4.31) circle (.1mm) ;
+        \draw[red,dotted] (4.725,4.31) -- (2.57,5.17) ;
+        \draw[red] (2.57,5.17) circle (.1mm) ;
+
+        \draw[red,dotted] (6,3.8) -- (6.23,4.98) ;
+        \draw[red] (6.23,4.98) circle (.1mm) ;
+        \draw[red] (5.855,3.05) circle (.1mm) ;
+        \draw[red] (5.855,3.05) -- (6,3.8) ;
+
+        \draw[red] (3.5,3) -- (3.25,3.25) ;
+        \draw[red] (3.5,3) circle (.1mm) ;
+        \draw[red] (2,4.5) circle (.1mm) ;
+        \draw[red,dotted] (3.25,3.25) -- (2,4.5) ;
+      \end{tikzpicture}
+</script>
+</center>
+
+<p>Using this alternative solution, with projecting onto each edge, we can see that there is no collision.</p>
+<p><span class="math display">$$
+\begin{array}{l}
+    ae \leftarrow |x_1| \\
+    be \leftarrow |x_2| \\
+    a \leftarrow (x_1[i], y_1[i]) \\
+    b \leftarrow (x_2[i], y_2[i]) \\
+    a_{edges} = \mathtt{GetEdges}~(a) \\
+    a_{interval} = \mathtt{GetProjectedIntervals}~(~\mathtt{NormalVector}(a_{edges}[i])~,~a~) \\
+    b_{interval} = \mathtt{GetProjectedIntervals}~(~\mathtt{NormalVector}(a_{edges}[i])~,~b~) \\
+    \textbf{If}~{\textbf{not}~(a_{interval}[i].\mathtt{overlap}(b_{interval}[i]))} \\
+    \{ \textbf{Return}~\textbf{false} \} ~\\
+    \{ \textbf{Return}~\textbf{true} \}
+\end{array}
+$$</span></p>
+<h2 id="minowski-difference">Minowski Difference</h2>
+<p>We can compute the Minowski difference between two convex polygons, by taking all points of the first polygon, and subtract all points of the other.</p>
+<center>
+<script type="text/tikz">
+  \begin{tikzpicture}
+    \filldraw[red] (3.5,3.5) circle (1.5pt) ;
+    \filldraw[red] (2.5,5) circle (1.5pt) ;
+    \filldraw[red] (3.5,5.5) circle (1.5pt) ;
+    \filldraw[red] (5,5) circle (1.5pt) ;
+    \filldraw[red] (4.5,4) circle (1.5pt) ;
+
+    \draw[red] (3.5,3.5) -- (2.5,5) -- (3.5,5.5) -- (5,5) -- (4.5,4) -- (3.5,3.5) ;
+
+    \filldraw[blue] (3.25,3.25) circle (1.5pt) ;
+    \filldraw[blue] (5,4.2) circle (1.5pt) ;
+    \filldraw[blue] (6,3.8) circle (1.5pt) ;
+    \filldraw[blue] (5.75,2.5) circle (1.5pt) ;
+    \filldraw[blue] (4,2.5) circle (1.5pt) ;
+
+    \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+    \draw[black] (-4,0) -- (6.5,0) ;
+    \draw[black] (0,-1.5) -- (0,5.5) ;
+
+    \filldraw[magenta] (0.25,0.25) circle (1.5pt) ;
+    \filldraw[magenta] (-1.5,-0.7) circle (1.5pt) ;
+    \filldraw[magenta] (-2.5,-0.3) circle (1.5pt) ;
+    \filldraw[magenta] (-2.25,1.0) circle (1.5pt) ;
+    \filldraw[magenta] (-0.5,1.0) circle (1.5pt) ;
+
+    \filldraw[magenta] (2.5-3.25,5-3.25) circle (1.5pt) ;
+    \filldraw[magenta] (2.5-5,5-4.2) circle (1.5pt) ;
+    \filldraw[magenta] (2.5-6,5-3.8) circle (1.5pt) ;
+    \filldraw[magenta] (2.5-5.75,5-2.5) circle (1.5pt) ;
+    \filldraw[magenta] (2.5-4,5-2.5) circle (1.5pt) ;
+
+    \filldraw[magenta] (3.5-3.25,5.5-3.25) circle (1.5pt) ;
+    \filldraw[magenta] (3.5-5,5.5-4.2) circle (1.5pt) ;
+    \filldraw[magenta] (3.5-6,5.5-3.8) circle (1.5pt) ;
+    \filldraw[magenta] (3.5-5.75,5.5-2.5) circle (1.5pt) ;
+    \filldraw[magenta] (3.5-4,5.5-2.5) circle (1.5pt) ;
+
+    \filldraw[magenta] (5-3.25,5-3.25) circle (1.5pt) ;
+    \filldraw[magenta] (5-5,5-4.2) circle (1.5pt) ;
+    \filldraw[magenta] (5-6,5-3.8) circle (1.5pt) ;
+    \filldraw[magenta] (5-5.75,5-2.5) circle (1.5pt) ;
+    \filldraw[magenta] (5-4,5-2.5) circle (1.5pt) ;
+
+    \filldraw[magenta] (4.5-3.25,4-3.25) circle (1.5pt) ;
+    \filldraw[magenta] (4.5-5,4-4.2) circle (1.5pt) ;
+    \filldraw[magenta] (4.5-6,4-3.8) circle (1.5pt) ;
+    \filldraw[magenta] (4.5-5.75,4-2.5) circle (1.5pt) ;
+    \filldraw[magenta] (4.5-4,4-2.5) circle (1.5pt) ;
+
+    \draw[magenta] (-1.5,-0.7) -- (-2.5,-0.3) -- (2.5-6,5-3.8)  -- (2.5-5.75,5-2.5) -- (3.5-5.75,5.5-2.5) -- (3.5-4,5.5-2.5) -- (5-4,5-2.5) -- (5-3.25,5-3.25) -- (4.5-3.25,4-3.25) -- (4.5-5,4-4.2) -- (-1.5,-0.7);
+  \end{tikzpicture}
+</script>
+</center>
+
+<p>We can see that we can take the bounding area before or after the calculation without effecting the result. Meaning we can prune points by doing it before. We can now test for collision by checking whether the origin (0,0) is inside of the Minowski difference polygon. We can see it will not be the case by looking at the plot, however to be precise we try to calculate the smallest simplex containing the origin. We start by defining guessing on a support vector, here <span class="math inline"><em>v</em><sub>0</sub> = ⟨ − 1, 0⟩</span>. An iteration is then defining the inversion <span class="math inline"><em>m</em><sub><em>v</em><sub><em>k</em></sub></sub> =  − <em>v</em><sub><em>k</em></sub></span>, we then find the point that is most in that direction <span class="math inline"><em>h</em><sub><em>p</em><sub><em>v</em></sub></sub></span> and that is least in that direction <span class="math inline"><em>h</em><sub><em>q</em><sub><em>v</em></sub></sub></span>, meaning most in the opposite direction. We then compute the difference <span class="math inline"><em>w</em><sub><em>k</em></sub> = <em>h</em><sub><em>p</em><sub><em>v</em></sub></sub> − <em>h</em><sub><em>q</em><sub><em>v</em></sub></sub></span>.</p>
+<center>
+<script type="text/tikz">
+  \begin{tikzpicture}
+      \filldraw[red] (5,5) circle (1.5pt) node[anchor=west] {\(h_{p_v}\)} ;
+
+      \draw[red] (3.5,3.5) -- (2.5,5) -- (3.5,5.5) -- (5,5) -- (4.5,4) -- (3.5,3.5) ;
+
+      \filldraw[blue] (3.25,3.25) circle (1.5pt) node[anchor=east] {\(h_{q_v}\)};
+
+      \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+      \draw[black] (-4,0) -- (6.5,0) ;
+      \draw[black] (0,-1.5) -- (0,5.5) ;
+
+      \filldraw[black!30!orange] (1.75,1.75) circle (1.5pt) node[anchor=west] {\(w_1\)} ;
+
+      \draw[magenta] (-1.5,-0.7) -- (-2.5,-0.3) -- (2.5-6,5-3.8)  -- (2.5-5.75,5-2.5) -- (3.5-5.75,5.5-2.5) -- (3.5-4,5.5-2.5) -- (5-4,5-2.5) -- (5-3.25,5-3.25) -- (4.5-3.25,4-3.25) -- (4.5-5,4-4.2) -- (-1.5,-0.7);
+    \end{tikzpicture}
+</script>
+</center>
+
+<p>We then add the vector <span class="math inline"><em>w</em><sub><em>k</em></sub></span> to a list for each iteration, and then calculate the best simplex. In this example it is simply <span class="math inline"><em>w</em><sub><em>k</em></sub></span> with weight <span class="math inline"><em>λ</em><sub><em>w</em><sub><em>k</em></sub></sub> = 1.0</span>, since it is the only element in the list, meaning <span class="math inline"><em>v</em><sub>1</sub> = <em>w</em><sub>0</sub></span>. We then compute the next <span class="math inline"><em>h</em><sub><em>q</em><sub><em>v</em></sub></sub>, <em>h</em><sub><em>p</em><sub><em>v</em></sub></sub></span> and <span class="math inline"><em>w</em><sub><em>k</em></sub></span>.</p>
+<center>
+<script type="text/tikz">
+  \begin{tikzpicture}
+      \filldraw[red] (3.5,3.5) circle (1.5pt) node[anchor=east] {\(h_{p_v}\)} ;
+
+      \draw[red] (3.5,3.5) -- (2.5,5) -- (3.5,5.5) -- (5,5) -- (4.5,4) -- (3.5,3.5) ;
+
+      \filldraw[blue] (6,3.8) circle (1.5pt) node[anchor=west] {\(h_{q_v}\)};
+
+      \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+      \draw[black] (-4,0) -- (6.5,0) ;
+      \draw[black] (0,-1.5) -- (0,5.5) ;
+
+      \filldraw[black!30!orange] (1.75,1.75) circle (1.5pt) node[anchor=west] {\(w_1\)} ;
+      \filldraw[black!30!orange] (-2.5,-0.3) circle (1.5pt) node[anchor=east] {\(w_2\)} ;
+
+      \draw[black!30!orange] (1.75,1.75) -- (-2.5,-0.3);
+
+      \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+      \draw[magenta] (-1.5,-0.7) -- (-2.5,-0.3) -- (2.5-6,5-3.8)  -- (2.5-5.75,5-2.5) -- (3.5-5.75,5.5-2.5) -- (3.5-4,5.5-2.5) -- (5-4,5-2.5) -- (5-3.25,5-3.25) -- (4.5-3.25,4-3.25) -- (4.5-5,4-4.2) -- (-1.5,-0.7);
+    \end{tikzpicture}
+</script>
+</center>
+
+<p>We then compute <span class="math inline"><em>λ</em></span> for <span class="math inline"><em>w</em><sub>1</sub></span> and <span class="math inline"><em>w</em><sub>2</sub></span>. We call it with <span class="math inline"><em>s</em><sub>1</sub> = <em>w</em><sub>2</sub></span> and <span class="math inline"><em>s</em><sub>2</sub> = <em>w</em><sub>1</sub></span>, we start by finding the coordinate with the largest distance:
+<span class="math display">$$
+\begin{align*}
+  t &amp;= s_2 - s_1 \\
+  p_O &amp;= s_2 - \mathtt{proj}_{s_2}(t) \\[3mm] % 3.5, 3.5
+  %
+  \mu^i &amp;= s_2^i - s_1^i \\
+  \mu_{\mathtt{max}} &amp;= \mu^I &amp; \text{where}~|\mu^I| = \max_{i \in \{x,y,z\}} |\mu^i| \\[3mm] % 4.25
+  %
+  M &amp;= \begin{pmatrix} s_1^I &amp; s_2^I \\ 1 &amp; 1 \end{pmatrix} \\
+  P_O &amp;= \begin{pmatrix} p_O^I \\ 1 \end{pmatrix} \\ % 3.5, 1
+  %
+  C_1 &amp;= det(M[1 = P_0]) \\
+  C_2 &amp;= det(M[2 = P_0])
+  % C_1 = 1.75
+  % C_2 = -6
+\end{align*}
+$$</span>
+If <span class="math inline"><em>C</em><sub>1</sub></span> and <span class="math inline"><em>C</em><sub>2</sub></span> have the same sign as <span class="math inline"><em>μ</em><sub><code>m</code><code>a</code><code>x</code></sub> =  − <em>d</em><em>e</em><em>t</em>(<em>M</em>)</span>, then we set <span class="math inline">$\lambda_j = \frac{C_j}{\mu_{\mathtt{max}}}$</span> and <span class="math inline"><em>W</em> = <em>s</em><sub>1</sub>, <em>s</em><sub>2</sub></span> otherwise we set <span class="math inline"><em>λ</em><sub>1</sub> = 1, <em>W</em> = <em>s</em><sub>1</sub></span>. For our example we get the last case meaning the next iteration is <span class="math inline"><em>v</em><sub>2</sub> = ⟨ − 2.5,  − 0.3⟩</span>:</p>
+<center>
+<script type="text/tikz">
+  \begin{tikzpicture}
+      \filldraw[red] (5,5) circle (1.5pt) node[anchor=west] {\(h_{p_v}\)} ;
+
+      \draw[red] (3.5,3.5) -- (2.5,5) -- (3.5,5.5) -- (5,5) -- (4.5,4) -- (3.5,3.5) ;
+
+      \filldraw[blue] (3.25,3.25) circle (1.5pt) node[anchor=east] {\(h_{q_v}\)};
+
+      \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+      \draw[black] (-4,0) -- (6.5,0) ;
+      \draw[black] (0,-1.5) -- (0,5.5) ;
+
+      % \filldraw[black!30!orange] (1.75,1.75) circle (1.5pt) node[anchor=west] {\(w_1\)} ;
+      \filldraw[black!30!orange] (-2.5,-0.3) circle (1.5pt) node[anchor=east] {\(w_2\)} ;
+      \filldraw[black!30!orange] (1.75,1.75) circle (1.5pt) node[anchor=east] {\(w_3\)} ;
+
+      \draw[black!30!orange] (1.75,1.75) -- (-2.5,-0.3);
+
+      \draw[blue] (3.25,3.25) -- (5,4.2) -- (6,3.8) -- (5.75,2.5) -- (4,2.5) -- (3.25,3.25) ;
+
+      \draw[magenta] (-1.5,-0.7) -- (-2.5,-0.3) -- (2.5-6,5-3.8)  -- (2.5-5.75,5-2.5) -- (3.5-5.75,5.5-2.5) -- (3.5-4,5.5-2.5) -- (5-4,5-2.5) -- (5-3.25,5-3.25) -- (4.5-3.25,4-3.25) -- (4.5-5,4-4.2) -- (-1.5,-0.7);
+    \end{tikzpicture}
+</script>
+</center>
+
+<h3 id="gilbert---johnson---keerthi-gjk-distance">Gilbert - Johnson - Keerthi (GJK) distance</h3>
+
+<h2 id="real-time-collision-detection">Real-time collision detection</h2>
+<p>We want collision detection, which does not just reject movement, but actually finds the correct position where a collision is initiated, and works from there, even if that is between two time steps. To do this we split our collision into a couple of phases:</p>
+<h3 id="proximity-phase">Proximity Phase</h3>
+<p>See Space-Coherent Data Structures. We also exclude all collision checks that we do not deem to be relevant, based on the collision categories, e.g. a player does not collide with his own weapons, or static terrain does not collide with different static terrain.</p>
+<p></p>
+<h3 id="broad-phase">Broad Phase</h3>
+<p>Broad phase is done with AABB collision check, through time. What we do is take the bounding box, and see where it starts and ends for a time interval, giving us two structures that overestimate the positions occupied in the current collision check, meaning if these do not collide, then we are sure no collisions will occur. An example can be seen in .</p>
+<center>
+<script type="text/tikz">
+  \begin{tikzpicture}
+    \draw[blue, dashed,->] (2.5,1.5) edge (4.5,3.5);
+    \draw[blue, dotted] (1,-0.5) rectangle (4,3.5) ;
+    \draw[blue, dotted] (2,0.5) rectangle (5,4.5) ;
+    \draw[blue, dotted] (3,1.5) rectangle (6,5.5) ;
+    \draw[blue] (4,-0.5) -- (6,1.5) ;
+    \draw[blue] (1,3.5) -- (3,5.5) ;
+    \draw[blue] (1,-0.5) -- (1,3.5) ;
+    \draw[blue] (1,-0.5) -- (4,-0.5) ;
+    \draw[blue] (3,5.5) -- (6,5.5) ;
+    \draw[blue] (6,1.5) -- (6,5.5) ;
+
+    \draw[red, dashed,->] (8,1.5) edge (6,1);
+    \draw[red, dotted] (6.5,-0.5) rectangle (9.5,3.5) ;
+    \draw[red, dotted] (5.5,-0.75) rectangle (8.5,3.25) ;
+    \draw[red, dotted] (4.5,-1.0) rectangle (7.5,3) ;
+    \draw[red] (9.5,3.5) -- (9.5,-0.5) ;
+    \draw[red] (9.5,3.5) -- (6.5,3.5) ;
+    \draw[red] (4.5,-1.0) -- (4.5,3) ;
+    \draw[red] (4.5,-1.0) -- (7.5,-1.0) ;
+    \draw[red] (6.5,3.5) -- (4.5,3) ;
+    \draw[red] (9.5,-0.5) -- (7.5,-1.0) ;
+
+  \end{tikzpicture}
+</script>
+</center>
+
+<h3 id="narrow-phase">Narrow Phase</h3>
+<p>In the narrow phase we use GJK / the Minowski difference to compute a distance function between the two polygons, which if we find all minimums will give us collision times. However we do binary search to find the collision point, since we do not want to compute this function, only a couple of values.</p>
+<h3 id="execution-phase">Execution Phase</h3>
+<p>In the execution phase, we sort all collision events based on collision time, so we can update based on a collision, and handle any new collision that might occur from that, by updating all relevant collision structures as we go. We then send the collision information to the agents, which do what they need to for that specific collision event / type.</p>
+	  </div>
+        </main>
+	
+        <footer>
+	    Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>
