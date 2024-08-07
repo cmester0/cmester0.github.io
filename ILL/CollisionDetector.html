@@ -439,9 +439,18 @@ If <span class="math inline"><em>C</em><sub>1</sub></span> and <span class="math
 </center>
 
 <h3 id="gilbert---johnson---keerthi-gjk-distance">Gilbert - Johnson - Keerthi (GJK) distance</h3>
-
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Gilbert–Johnson–Keerthi_distance_algorithm">https://en.wikipedia.org/wiki/Gilbert–Johnson–Keerthi_distance_algorithm</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Minkowski_Portal_Refinement">https://en.wikipedia.org/wiki/Minkowski_Portal_Refinement</a></li>
+</ul>
 <h2 id="real-time-collision-detection">Real-time collision detection</h2>
 <p>We want collision detection, which does not just reject movement, but actually finds the correct position where a collision is initiated, and works from there, even if that is between two time steps. To do this we split our collision into a couple of phases:</p>
+<ul>
+<li>Proximity phase: Is there a possibility of a collision (close proximity)</li>
+<li>Broad phase: Is there even any collision</li>
+<li>Narrow phase: Check for collision with higher resolution, and find collision time</li>
+<li>Execution phase: Sort the collision events based on collision time, and handle one-by-one, updating collision events based on changes.</li>
+</ul>
 <h3 id="proximity-phase">Proximity Phase</h3>
 <p>See Space-Coherent Data Structures. We also exclude all collision checks that we do not deem to be relevant, based on the collision categories, e.g. a player does not collide with his own weapons, or static terrain does not collide with different static terrain.</p>
 <p></p>
