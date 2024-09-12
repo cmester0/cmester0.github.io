@@ -150,9 +150,24 @@ which can be constructed in <span class="math inline">𝒪(<em>n</em>)</span> ti
 They represent all embeddings, so generating / changing the world dynamically will be a lot easier.</p>
 <p>There exists implementations of SPQR trees (e.g. Sage Math).
 However, most drawings using SPQR trees are trying to minimize the space when drawn on a grid.
-For our purpose we want to improve this presentation, by using a (mixed?) integer linear program (ILP) to optimize the layout.</p>
+For our purpose, we want to improve this presentation, by using a (mixed?) integer linear program (ILP) to optimize the layout.</p>
+<h2 id="inspiration-very-large-scale-integration-vlsi">Inspiration: Very-large-scale integration (VLSI)</h2>
 <h2 id="floorplan">Floorplan</h2>
 <p>TODO: describe how we take an adjacency graph and transform it into areas.</p>
+<blockquote>
+<p>In the literature, there does not exist any algorithm that talks about the existence and construction of an IFP corresponding to a given PTG.</p>
+</blockquote>
+<p>We can use the optimization problem in “MIQP-based Layout Design for Building Interiors” to get our resulting game map!</p>
+<p><img src="../images/WorldGeneration/map_gen_mipq.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p>Open source Formats: BOOKSHELF floorplan</p>
+<p>Benchmarks: <a href="https://github.com/haoxingren/Floorplan">https://github.com/haoxingren/Floorplan</a> , <a href="https://plato.asu.edu/ftp/network.html">https://plato.asu.edu/ftp/network.html</a></p>
+<h2 id="area-script">Area script</h2>
+<p>For each area, you can write code for how it is generated.
+The code is structured into levels, so for the first level you can sample the layers of randomness.
+For the remaining levels, you can set variables and compare variables of previous levels.
+For the last layer, you can place objects in the world, based on the variables.</p>
+<h2 id="keywords">Keywords</h2>
+<p>VLSI layout, planar graph, combinatorial embedding, SQPR tree, floorplan, rectangular packing adjacency constraint</p>
 	  </div>
         </main>
 	
