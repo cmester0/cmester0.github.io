@@ -39,21 +39,21 @@
 <h1 id="continuous-random-noise-map">Continuous Random Noise Map</h1>
 <p>If we can make a continuous noise map, then we can generate a map based on those values.
 For example, we can build a simple infinite dungeon by generating a path anywhere, where the value is in the range (0.3, 0.7) or (0.4, 0.6).</p>
-<p><img src="../images/WorldGeneration/Screenshot from 2021-03-18 03-09-06.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
-<p><img src="../images/WorldGeneration/Screenshot from 2021-03-18 03-15-10.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/Screenshot from 2021-03-18 03-09-06.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
+<p><img src="../images/WorldGeneration/Screenshot from 2021-03-18 03-15-10.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>You can also different layers to represent e.g. height (0.01), humidity (0.02) and temperature (0.04).</p>
-<p><img src="../images/WorldGeneration/map_image_noise_height.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
-<p><img src="../images/WorldGeneration/map_image_noise_humidity.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
-<p><img src="../images/WorldGeneration/map_image_noise_temperature.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_image_noise_height.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
+<p><img src="../images/WorldGeneration/map_image_noise_humidity.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
+<p><img src="../images/WorldGeneration/map_image_noise_temperature.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>By having different scales, we get a dynamic interaction, and slow but consistent change in biomes. Overlaying these we get:</p>
-<p><img src="../images/WorldGeneration/map_image_noise_biome.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_image_noise_biome.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>Here the colors are defined by:</p>
 <p><span class="math display"><em>h</em> = 1 − ⌊<em>h</em><em>e</em><em>i</em><em>g</em><em>h</em><em>t</em>⌋<sub>1/12</sub> − 0.2</span></p>
 <p><span class="math display"><em>s</em> = ⌊<em>h</em><em>u</em><em>m</em><em>i</em><em>d</em><em>i</em><em>t</em><em>y</em>⌋<sub>1/3</sub> + 0.3</span></p>
 <p><span class="math display"><em>v</em> = ⌊<em>t</em><em>e</em><em>m</em><em>p</em><em>e</em><em>r</em><em>a</em><em>t</em><em>u</em><em>r</em><em>e</em>⌋<sub>1/3</sub> + 0.3</span></p>
 <p>File: <code>noise_layer.py</code>.</p>
 <p>And you can even add extra structure (city, roads, rivers) on top:</p>
-<p><img src="../images/WorldGeneration/map_image_noise_biome_city.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_image_noise_biome_city.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <h2 id="system-random-noise">System Random Noise</h2>
 <p>TODO: Describe why we are not using system random noise</p>
 <h2 id="perlin-noise">Perlin Noise</h2>
@@ -80,14 +80,17 @@ This can be done by running Astar, loading any chunk we need to walk through to 
 That is we can do this process recursively in different scales, not just around the player, but also for global structure.</p>
 <h1 id="dungeon-generation">Dungeon generation</h1>
 <p>We start by generating random points, then filling in using iterative organic growth (can be done faster using Voronoi, see [Testing using random graphs]).</p>
-<p><img src="../images/WorldGeneration/map_0_image_a_pre_remove.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_0_image_a_pre_remove.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>Selecting some areas at random</p>
-<p><img src="../images/WorldGeneration/map_0_image_b_pre_road.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_0_image_b_pre_road.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>Then make a minimum spanning tree (using Prim’s algorithm allowing wrapping).</p>
-<p><img src="../images/WorldGeneration/map_0_image_c_pre_crawl.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_0_image_c_pre_crawl.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>We can then normalize the map, so there is no wrapping.</p>
-<p><img src="../images/WorldGeneration/map_0_image_d.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_0_image_d.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>We can do as we did with the noise maps.</p>
+<h2 id="answer-set-programming-asp">Answer Set Programming (ASP)</h2>
+<p>Another great way to do dungeon generation, or even world generation is
+Answer Set Programming (ASP). Which is a form of logical programming.</p>
 <h1 id="how-do-we-do-it">How do we do it?</h1>
 <h2 id="phases-of-world-generation">Phases of world generation</h2>
 <p>We start by making a graph that represents the order or connectivity between different areas.
@@ -158,16 +161,33 @@ For our purpose, we want to improve this presentation, by using a (mixed?) integ
 <p>In the literature, there does not exist any algorithm that talks about the existence and construction of an IFP corresponding to a given PTG.</p>
 </blockquote>
 <p>We can use the optimization problem in “MIQP-based Layout Design for Building Interiors” to get our resulting game map!</p>
-<p><img src="../images/WorldGeneration/map_gen_mipq.png" style="display: block; margin-left: auto; margin-right: auto;" width="500" /></p>
+<p><img src="../images/WorldGeneration/map_gen_mipq.png" style="display: block; margin-left: auto; margin-right: auto;width:58%" /></p>
 <p>Open source Formats: BOOKSHELF floorplan</p>
-<p>Benchmarks: <a href="https://github.com/haoxingren/Floorplan">https://github.com/haoxingren/Floorplan</a> , <a href="https://plato.asu.edu/ftp/network.html">https://plato.asu.edu/ftp/network.html</a></p>
+<p>Benchmarks: <a href="https://github.com/haoxingren/Floorplan">https://github.com/haoxingren/Floorplan</a> , <a href="https://plato.asu.edu/ftp/network.html">https://plato.asu.edu/ftp/network.html</a>, (GSRC: n100, n200, n300), (MCNC: ami33, ami49)</p>
+<ul>
+<li>MCNC, GSRC, HB+, and ami49<sub>x</sub></li>
+</ul>
+<p>Parquet 4.0: <a href="http://vlsicad.eecs.umich.edu/BK/parquet/index.html">http://vlsicad.eecs.umich.edu/BK/parquet/index.html</a></p>
+<ul>
+<li>Constrained Adjacency Graph</li>
+</ul>
 <h2 id="area-script">Area script</h2>
 <p>For each area, you can write code for how it is generated.
 The code is structured into levels, so for the first level you can sample the layers of randomness.
 For the remaining levels, you can set variables and compare variables of previous levels.
 For the last layer, you can place objects in the world, based on the variables.</p>
+<h2 id="quadratic-placers">Quadratic placers</h2>
+<ul>
+<li>Kraftwerk2 - A Fast Force-Directed Quadratic Placement Approach Using an Accurate Net Model</li>
+<li>ePlace: Electrostatics based Placement using Fast Fourier Transform and Nesterov’s Method</li>
+<li>PeF: Poisson’s Equation-Based Large-Scale Fixed-Outline Floorplanning</li>
+</ul>
 <h2 id="keywords">Keywords</h2>
 <p>VLSI layout, planar graph, combinatorial embedding, SQPR tree, floorplan, rectangular packing adjacency constraint</p>
+<h1 id="honorable-mentions">Honorable mentions</h1>
+<ul>
+<li>Computer Role Playing Games (CRPGs)</li>
+</ul>
 	  </div>
         </main>
 	
