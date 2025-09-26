@@ -271,16 +271,14 @@ $$</span></p>
 <p>Using this alternative solution, with projecting onto each edge, we can see that there is no collision.</p>
 <p><span class="math display">$$
 \begin{array}{l}
-    ae \leftarrow |x_1| \\
-    be \leftarrow |x_2| \\
+    ae \leftarrow |x_{1}| \\
+    be \leftarrow |x_{2}| \\
     a \leftarrow (x_1[i], y_1[i]) \\
     b \leftarrow (x_2[i], y_2[i]) \\
     a_{edges} = \mathtt{GetEdges}~(a) \\
     a_{interval} = \mathtt{GetProjectedIntervals}~(~\mathtt{NormalVector}(a_{edges}[i])~,~a~) \\
     b_{interval} = \mathtt{GetProjectedIntervals}~(~\mathtt{NormalVector}(a_{edges}[i])~,~b~) \\
-    \textbf{If}~{\textbf{not}~(a_{interval}[i].\mathtt{overlap}(b_{interval}[i]))} \\
-    \{ \textbf{Return}~\textbf{false} \} ~\\
-    \{ \textbf{Return}~\textbf{true} \}
+    \textbf{Return}~a_{interval}[i].\mathtt{overlap}(b_{interval}[i])
 \end{array}
 $$</span></p>
 <h2 id="minowski-difference">Minowski Difference</h2>
@@ -441,6 +439,16 @@ If <span class="math inline"><em>C</em><sub>1</sub></span> and <span class="math
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Gilbert–Johnson–Keerthi_distance_algorithm">https://en.wikipedia.org/wiki/Gilbert–Johnson–Keerthi_distance_algorithm</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Minkowski_Portal_Refinement">https://en.wikipedia.org/wiki/Minkowski_Portal_Refinement</a></li>
+</ul>
+<p>Articles:</p>
+<ul>
+<li>A Fast dprocedure for Computing the Distance Between Complex Objects in Three-Dimensional Space</li>
+<li>Improving the GJK algorithm for faster and more reliable distance queries between convex objects</li>
+<li>Collision Detection Accelerated: An Optimization Perspective</li>
+</ul>
+<h3 id="expanding-polytope-algorithm">Expanding Polytope Algorithm</h3>
+<ul>
+<li><a href="https://dyn4j.org/2010/05/epa-expanding-polytope-algorithm/">https://dyn4j.org/2010/05/epa-expanding-polytope-algorithm/</a></li>
 </ul>
 <h2 id="real-time-collision-detection">Real-time collision detection</h2>
 <p>We want collision detection, which does not just reject movement, but actually finds the correct position where a collision is initiated, and works from there, even if that is between two time steps. To do this we split our collision into a couple of phases:</p>
